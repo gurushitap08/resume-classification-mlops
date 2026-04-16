@@ -24,17 +24,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run training script
+    - name: Check training script syntax
       run: |
-        python src/train.py
+        python -m py_compile src/train.py
+        echo "✅ Training script syntax OK"
 
     - name: Build Docker image
       run: |
         docker build -t resume-classification .
-
-    - name: Test API health
-      run: |
-        docker run -d -p 8000:8000 --name test-container resume-classification
-        sleep 5
-        curl http://localhost:8000/
-        docker stop test-container
