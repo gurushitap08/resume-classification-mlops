@@ -1,0 +1,6 @@
+resume-mlops/
+mlruns/
+__pycache__/
+*.pyc
+.env
+.git

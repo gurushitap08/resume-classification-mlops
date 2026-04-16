@@ -14,6 +14,11 @@ from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report
 
+# ── MLflow Setup ──────────────────────────────────────────────
+os.makedirs("mlruns", exist_ok=True)
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
+mlflow.set_experiment("Resume_Classification")
+
 # ── 1. Load Data ──────────────────────────────────────────────
 df = pd.read_csv("data/resume_data.csv")
 print(f"Dataset shape: {df.shape}")
@@ -39,14 +44,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# ── 4. TF-IDF Vectorizer ──────────────────────────────────────
-tfidf = TfidfVectorizer(max_features=1500, stop_words='english')
-
 os.makedirs("models", exist_ok=True)
 
-mlflow.set_experiment("Resume_Classification")
-
-# ── 5. Model 1: PCA + Random Forest ──────────────────────────
+# ── 4. Model 1: PCA + Random Forest ──────────────────────────
 print("\nTraining PCA + Random Forest...")
 with mlflow.start_run(run_name="PCA_RandomForest"):
     pipeline_rf = Pipeline([
@@ -65,7 +65,7 @@ with mlflow.start_run(run_name="PCA_RandomForest"):
     mlflow.sklearn.log_model(pipeline_rf, "rf_model")
     joblib.dump(pipeline_rf, "models/rf_model.pkl")
 
-# ── 6. Model 2: PCA + SVM ────────────────────────────────────
+# ── 5. Model 2: PCA + SVM ────────────────────────────────────
 print("\nTraining PCA + SVM...")
 with mlflow.start_run(run_name="PCA_SVM"):
     pipeline_svm = Pipeline([
@@ -84,7 +84,7 @@ with mlflow.start_run(run_name="PCA_SVM"):
     mlflow.sklearn.log_model(pipeline_svm, "svm_model")
     joblib.dump(pipeline_svm, "models/svm_model.pkl")
 
-# ── 7. Save Label Encoder ─────────────────────────────────────
+# ── 6. Save Label Encoder ─────────────────────────────────────
 joblib.dump(le, "models/label_encoder.pkl")
 
 print("\n✅ Training complete!")
